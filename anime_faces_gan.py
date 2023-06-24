@@ -2,7 +2,7 @@ import tensorflow as tf
 import os
 import matplotlib.pyplot as plt
 
-###################
+##################
 !ls -lha kaggle.json
 !pip install -q kaggle
 !mkdir -p ~/.kaggle
@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 !kaggle datasets download -d splcher/animefacedataset
 
 !unzip animefacedataset
-###################
+##################
 gpus=tf.config.experimental.list_physical_devices('GPU')
 for gpu in gpus:
     tf.config.experimental.set_memory_growth(gpu,True)
@@ -29,7 +29,6 @@ def load_image(path):
     return image
 
 img=load_image(image.next())
-print(img.shape)
 plt.imshow(img)
 plt.tight_layout()
 plt.axis("off")
@@ -66,3 +65,50 @@ def get_figure():
 
 images=data_iterator.next()
 show_images(images)
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense,Conv2DTranspose,Reshape,BatchNormalization,Conv2D,MaxPool2D,Flatten
+import numpy as np
+
+def build_generator():
+    model=Sequential(name='generator')
+
+    model.add(Dense(4*4*128,input_shape=(128,)))
+    model.add(Reshape((4,4,128)))
+    model.add(Conv2DTranspose(64,(4,4),2,padding='same',activation='relu',kernel_initializer='random_uniform'))
+    model.add(BatchNormalization())
+    model.add(Conv2DTranspose(64,(4,4),2,padding='same',activation='relu',kernel_initializer='random_uniform'))
+    model.add(BatchNormalization())
+    model.add(Conv2DTranspose(32,(4,4),2,padding='same',activation='relu',kernel_initializer='random_uniform'))
+    model.add(BatchNormalization())
+    model.add(Conv2DTranspose(32,(4,4),2,padding='same',activation='relu',kernel_initializer='random_uniform'))
+    model.add(BatchNormalization())
+    model.add(Conv2DTranspose(3,(4,4),1,padding='same',activation='sigmoid',kernel_initializer='random_uniform'))
+    return model
+
+generator=build_generator()
+generator.summary()
+
+tf.keras.utils.plot_model(generator,show_shapes=True,show_layer_activations=True,to_file='architecture/generator.png')
+
+images=generator.predict(np.random.randn(128,128),verbose=0)
+show_images(images)
+
+def build_discriminator():
+    model=Sequential(name='discriminator')
+
+    model.add(Conv2D(32,(5,5),1,input_shape=(64,64,3)))
+    model.add(MaxPool2D())
+    model.add(Conv2D(64,(5,5),1,activation='relu',kernel_initializer='he_normal'))
+    model.add(MaxPool2D())
+    model.add(Conv2D(128,(3,3),1,activation='relu',kernel_initializer='he_normal'))
+    model.add(Conv2D(512,(3,3),1,activation='relu',kernel_initializer='he_normal'))
+    model.add(MaxPool2D())
+    model.add(Flatten())
+    model.add(Dense(256,activation='relu'))
+    model.add(Dense(1,activation='sigmoid'))
+
+    return model
+
+discriminator=build_discriminator()
+print(discriminator.summary())
