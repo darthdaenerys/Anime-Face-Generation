@@ -27,3 +27,42 @@ def load_image(path):
     image=tf.image.resize(image,size=(64,64))
     image=image/255.0
     return image
+
+img=load_image(image.next())
+print(img.shape)
+plt.imshow(img)
+plt.tight_layout()
+plt.axis("off")
+plt.show()
+
+data=tf.data.Dataset.list_files(os.path.join('images','*jpg'))
+data=data.map(load_image)
+data=data.shuffle(10000)
+data=data.batch(256)
+data=data.prefetch(tf.data.AUTOTUNE)
+data_iterator=data.as_numpy_iterator()
+
+def show_images(images):
+    idx=0
+    fig,ax=plt.subplots(nrows=4,ncols=8,figsize=(20,10))
+    for row in range(4):
+        for col in range(8):
+            ax[row][col].imshow(images[idx])
+            ax[row][col].axis('off')
+            idx+=1
+    fig.tight_layout()
+  
+def get_figure():
+    images=generator.predict(np.random.randn(128,128),verbose=0)
+    idx=0
+    fig,ax=plt.subplots(nrows=4,ncols=8,figsize=(20,10))
+    for row in range(4):
+        for col in range(8):
+            ax[row][col].imshow(images[idx])
+            ax[row][col].axis('off')
+            idx+=1
+    fig.tight_layout()
+    return fig
+
+images=data_iterator.next()
+show_images(images)
