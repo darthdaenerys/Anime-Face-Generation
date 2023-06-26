@@ -122,3 +122,16 @@ generator_opt=Adam(learning_rate=0.0004)
 discriminator_opt=Adam(learning_rate=0.001)
 generator_loss=BinaryCrossentropy()
 discriminator_loss=BinaryCrossentropy()
+
+class AnimeGAN(tf.keras.models.Model):
+    def __init__(self,generator,discriminator,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.generator=generator
+        self.discriminator=discriminator
+    
+    def compile(self,g_opt,g_loss,d_opt,d_loss,*args,**kwargs):
+        super().compile(*args,**kwargs)
+        self.generator_loss=g_loss
+        self.generator_opt=g_opt
+        self.discriminator_loss=d_loss
+        self.discriminator_opt=d_opt
