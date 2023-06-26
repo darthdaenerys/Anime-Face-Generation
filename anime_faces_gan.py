@@ -112,3 +112,13 @@ def build_discriminator():
 
 discriminator=build_discriminator()
 print(discriminator.summary())
+
+tf.keras.utils.plot_model(discriminator,show_shapes=True,show_layer_activations=True,to_file='architecture/discriminator.png')
+
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.losses import BinaryCrossentropy
+
+generator_opt=Adam(learning_rate=0.0004)
+discriminator_opt=Adam(learning_rate=0.001)
+generator_loss=BinaryCrossentropy()
+discriminator_loss=BinaryCrossentropy()
