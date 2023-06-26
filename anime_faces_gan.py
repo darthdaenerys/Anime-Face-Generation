@@ -135,3 +135,33 @@ class AnimeGAN(tf.keras.models.Model):
         self.generator_opt=g_opt
         self.discriminator_loss=d_loss
         self.discriminator_opt=d_opt
+    
+    def train_step(self,batch):
+        # fetch data
+        fake_images=self.generator(np.random.randn(128,128),training=False)
+        real_images=batch
+
+        # train discriminator
+        with tf.GradientTape() as d_tape:
+            yhat_real=self.discriminator(real_images,training=True)
+            yhat_fake=self.discriminator(fake_images,training=True)
+            yhat_realfake=tf.concat([yhat_real,yhat_fake],axis=0)
+            y_realfake=tf.concat([tf.zeros_like(yhat_real),tf.ones_like(yhat_fake)],axis=0)
+            noise_real = 0.15*tf.random.uniform(tf.shape(yhat_real))
+            noise_fake = -0.15*tf.random.uniform(tf.shape(yhat_fake))
+            y_realfake += tf.concat([noise_real, noise_fake], axis=0)
+            d_loss = self.discriminator_loss(y_realfake, yhat_realfake)
+            
+        # apply backpropagation to train discriminator
+        d_grad=d_tape.gradient(d_loss,self.discriminator.trainable_variables)
+        self.discriminator_opt.apply_gradients(zip(d_grad,self.discriminator.trainable_variables))
+
+        with tf.GradientTape() as g_tape:
+            gen_images = self.generator(tf.random.normal((128,128)), training=True)
+            predicted_labels = self.discriminator(gen_images, training=False)
+            g_loss = self.generator_loss(tf.zeros_like(predicted_labels), predicted_labels) 
+
+        ggrad = g_tape.gradient(g_loss, self.generator.trainable_variables)
+        self.generator_opt.apply_gradients(zip(ggrad, self.generator.trainable_variables))
+
+        return {'g_loss':g_loss,'d_loss':d_loss}
