@@ -165,3 +165,26 @@ class AnimeGAN(tf.keras.models.Model):
         self.generator_opt.apply_gradients(zip(ggrad, self.generator.trainable_variables))
 
         return {'g_loss':g_loss,'d_loss':d_loss}
+
+from tensorflow.keras.preprocessing.image import array_to_img
+
+class ModelMonitor(tf.keras.callbacks.Callback):
+    def __init__(self,num_images=1,latent_dim=128):
+        self.num_images=num_images
+        self.latent_dim=latent_dim
+    
+    def on_epoch_end(self,epoch,logs=tf.keras.callbacks.TensorBoard(log_dir='logs')):
+        if epoch%2==0:
+          generated_images=generator(np.random.randn(self.num_images,self.latent_dim,1),training=False)
+          generated_images=(generated_images*255)
+          generated_images=tf.cast(generated_images,dtype=np.int32)
+          fig=get_figure()
+          fig.savefig(os.path.join('generated',f'generated-fig-{epoch+1}.jpg'))
+          for i in range(self.num_images):
+              img=array_to_img(generated_images[i])
+              img.save(os.path.join('generated',f'generated-img-{epoch+1}.{i}.jpg'))
+          generator.save_weights('ckpt/generator_weights')
+          discriminator.save_weights('ckpt/discriminator_weights')
+
+anime_gan=AnimeGAN(generator,discriminator)
+anime_gan.compile(generator_opt,generator_loss,discriminator_opt,discriminator_loss)
