@@ -196,3 +196,28 @@ history=anime_gan.fit(data,epochs=100,callbacks=[
 
 images=generator.predict(np.random.randn(32,128),verbose=0)
 show_images(images)
+
+import pandas as pd
+
+df=pd.DataFrame(history.history)
+df.to_csv('metrics.csv')
+plt.style.use('fivethirtyeight')
+plt.figure(figsize=(20,5))
+plt.plot(df['g_loss'],label='Generator loss',color='#420452')
+plt.plot(df['d_loss'],label='Discriminator loss',color='#5A9412')
+plt.legend()
+plt.title('Model Metrics')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.show()
+
+# ------------!!!  CAUTION  !!!---------------------
+
+if not os.path.exists('metadata'):
+    os.mkdir('metadata')
+anime_gan.generator.save('./metadata/')
+anime_gan.discriminator.save('./metadata/')
+if not os.path.exists('models'):
+    os.mkdir('models')
+tf.keras.models.save_model(anime_gan.generator,os.path.join('models','generator.h5'))
+tf.keras.models.save_model(anime_gan.discriminator,os.path.join('models','discriminator.h5'))
