@@ -188,3 +188,11 @@ class ModelMonitor(tf.keras.callbacks.Callback):
 
 anime_gan=AnimeGAN(generator,discriminator)
 anime_gan.compile(generator_opt,generator_loss,discriminator_opt,discriminator_loss)
+
+history=anime_gan.fit(data,epochs=100,callbacks=[
+    ModelMonitor(),
+    tf.keras.callbacks.TensorBoard('logs')
+])
+
+images=generator.predict(np.random.randn(32,128),verbose=0)
+show_images(images)
