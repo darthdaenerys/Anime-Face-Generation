@@ -3,15 +3,15 @@ import os
 import matplotlib.pyplot as plt
 
 ##################
-!ls -lha kaggle.json
-!pip install -q kaggle
-!mkdir -p ~/.kaggle
-!cp kaggle.json ~/.kaggle/
-!chmod 600 /root/.kaggle/kaggle.json
+# !ls -lha kaggle.json
+# !pip install -q kaggle
+# !mkdir -p ~/.kaggle
+# !cp kaggle.json ~/.kaggle/
+# !chmod 600 /root/.kaggle/kaggle.json
 
-!kaggle datasets download -d splcher/animefacedataset
+# !kaggle datasets download -d splcher/animefacedataset
 
-!unzip animefacedataset
+# !unzip animefacedataset
 ##################
 gpus=tf.config.experimental.list_physical_devices('GPU')
 for gpu in gpus:
