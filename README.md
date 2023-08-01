@@ -12,9 +12,16 @@ Both networks try to improve each other's performance through backpropagation.
 
 ![Alt text](image.png)
 
+## Getting Started
+
+- Use the command to clone this repository to your machine git clone `https://github.com/darthdaenerys/Anime-Face-Generation.git`
+- Now change current directory to the folder `cd Anime-Face-Generation`
+- `pip install -r requirements.txt`
+- `python generator.py`
+
 ## Dataset
 
-The dataset is taken from Kaggle over here. The data was obtained from https://www.kaggle.com/datasets/splcher/animefacedataset. The dataset contains images of different sizes.
+The dataset is taken from Kaggle over here. The data was obtained from [here](https://www.kaggle.com/datasets/splcher/animefacedataset). The dataset contains images of different sizes.
 
 ## Contributing
 
